@@ -17,7 +17,7 @@ session_id = 'dfpgfnnkqsknb6ur16441oa6yq90hr32'
 path = "BXH.csv"
 
 # Danh sách các thành viên cần kiểm tra (có thể thay đổi mặc định theo nhóm)
-Group = ["phanhhoccode", "nguyenvanchinh28", "anhkhoi16", "Nguyenduytan"]
+Group = ["nguyenvanchinh28", "Nguyenduytan", "phanhhoccode", "anhkhoi16"]
 
 def UI():
     window = Tk()
@@ -76,18 +76,19 @@ def WriteToCSV(path, Group, User) -> None:
     with open(path, "w", encoding="utf-8") as OutFile:
         OutFile.write("Rank,ID,")
         for i in list_lesson:
-            OutFile.write(str(i)+",")
+            OutFile.write("Lesson "+str(i)+",")
         OutFile.write("Total,")
         OutFile.write("\n")
-        for x in User:
-            if x["ID"] in Group:
-                for index, j in enumerate(x):
-                    if (x[j] != 0):
-                        OutFile.write(" "+str(x[j]))
-                        if index > 1:
-                            OutFile.write('/'+str(num_exercise[index-2]))
-                    OutFile.write(',')
-                OutFile.write("\n")
+        for ID in Group:
+            for x in User:
+                if x["ID"] == ID:
+                    for index, j in enumerate(x):
+                        if (x[j] != 0):
+                            OutFile.write(" "+str(x[j]))
+                            if index > 1:
+                                OutFile.write('/'+str(num_exercise[index-2]))
+                        OutFile.write(',')
+                    OutFile.write("\n")
 
 if __name__ == "__main__":
     # bật / tắt giao diện nhập
