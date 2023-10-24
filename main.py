@@ -1,19 +1,37 @@
 import requests
 import subprocess
 from bs4 import BeautifulSoup
+from tkinter import *
 #  Danh sách các buổi
 list_lesson = (2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
-               15, 16, 17, 18, 19, 20, 21, 23, 24, 25, 26)
+               15, 16, 17, 18, 19, 20, 21,22, 23, 24, 25, 26)
 #  Số lượng bài tập
 num_exercise = (29, 20, 27, 0, 7, 17, 0, 6, 26, 13, 5, 10,
-                11, 0, 20, 5, 6, 0, 0, 0, 0, 0, 0, 0, 258)
+                11, 0, 20, 5, 6, 10, 0, 6, 0, 0, 11, 0, 5, 258)
 
 session_id = 'dfpgfnnkqsknb6ur16441oa6yq90hr32	'
-file_path = 'D:\DSA\Python\BXH.csv'
+path = "BXH.csv"
 
 #  Nhóm người cần check
-Group = ["nguyenduchuong300903fullhouse", "nguyenvanchinh28", "anhkhoi16", "Nguyenduytan"]
-
+Group = ["phanhhoccode", "nguyenvanchinh28", "anhkhoi16", "Nguyenduytan"]
+def UI():
+    window = Tk()
+    window.geometry("500x100")
+    window.title("Lấy dữ liệu bài tập") 
+    label = Label(window , text= "Nhập ID hoặc danh sách ID cần kiểm tra", font="intelOne")
+    label.pack(side = 'top')
+    entry_data = StringVar()
+    entry = Entry(window , width = 100 , foreground="green", textvariable=entry_data)
+    entry.pack(side = TOP)
+    def get():
+        global Group
+        if(entry.get().split()):
+            Group = entry.get().split()
+        window.destroy()
+    button = Button(window,command=get,text="Gửi")
+    button.pack(side=TOP)
+    window.mainloop()
+   
 
 def request(session_id) -> None:
     session = requests.Session()
@@ -68,15 +86,13 @@ def WriteToCSV(path, Group, User) -> None:
                     OutFile.write(',')
                 OutFile.write("\n")
 
-
 if __name__ == "__main__":
+    UI()
     res = request(session_id)
     if res.status_code == 200:
         print("Success")
         data = GetData(res)
-        path = "BXH.csv"
-        WriteToCSV(path, Group, data)
-        
-        subprocess.Popen(['start', file_path], shell=True)
+        WriteToCSV(path,Group, data)
+        subprocess.Popen(['start', path], shell=True)
     else:
         print("Can't connect")
