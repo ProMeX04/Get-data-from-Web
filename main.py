@@ -9,9 +9,10 @@ num_exercise = (29, 20, 27, 0, 7, 17, 0, 6, 26, 13, 5, 10,
                 11, 0, 20, 5, 6, 0, 0, 0, 0, 0, 0, 0, 258)
 
 session_id = 'dfpgfnnkqsknb6ur16441oa6yq90hr32	'
+file_path = 'D:\DSA\Python\BXH.csv'
 
 #  Nhóm người cần check
-Group = ["phanhhoccode", "nguyenvanchinh28", "anhkhoi16", "Nguyenduytan"]
+Group = ["nguyenduchuong300903fullhouse", "nguyenvanchinh28", "anhkhoi16", "Nguyenduytan"]
 
 
 def request(session_id) -> None:
@@ -75,7 +76,7 @@ if __name__ == "__main__":
         data = GetData(res)
         path = "BXH.csv"
         WriteToCSV(path, Group, data)
-        file_path = 'D:\DSA\Python\BXH.csv'
+        
         subprocess.Popen(['start', file_path], shell=True)
     else:
         print("Can't connect")
