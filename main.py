@@ -1,3 +1,4 @@
+# Cài đặt python và Cài đặt các thư viện phía dưới mới có thể sử dụng được
 import requests
 import subprocess
 from bs4 import BeautifulSoup
