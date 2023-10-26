@@ -18,7 +18,11 @@ session_id = 'dfpgfnnkqsknb6ur16441oa6yq90hr32'
 path = "BXH.csv"
 
 # Danh sách các thành viên cần kiểm tra (có thể thay đổi mặc định theo nhóm)
-Group = ["nguyenvanchinh28", "Nguyenduytan", "phanhhoccode", "anhkhoi16"]
+Group = ["alisegaunt","Hoanghieu2603","","","kienbnvn2004","","","",
+         "","","","","","","nguyenvanchinh28", "Nguyenduytan", "phanhhoccode", "anhkhoi16","",
+         "Tram_le2003","huynhduong152","","QuocThang","nguyenduchuong300903fullhouse","","nhi9999","",
+         "gia_huy922004","daoduykhai77","HoanganhIT2K4","anhquan","","",
+         "Phuong_10","Huongphanminh","giaudeptrai","Ducthinh20","ninhlong21","duongngan1810","duongngan1810"]
 
 def UI():
     window = Tk()
@@ -89,7 +93,7 @@ def WriteToCSV(path, Group, User) -> None:
                             if index > 1:
                                 OutFile.write('/'+str(num_exercise[index-2]))
                         OutFile.write(',')
-                    OutFile.write("\n")
+            OutFile.write("\n")
 
 if __name__ == "__main__":
     # bật / tắt giao diện nhập
