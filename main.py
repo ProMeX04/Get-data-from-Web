@@ -121,6 +121,6 @@ if __name__ == "__main__":
         print("Success")
         data = get_data(res)
         write_to_csv(__path__, group, data)
-        subprocess.Popen(['cat', __path__], shell=False)
+        subprocess.Popen(['start', __path__], shell=True)
     else:
         print("Can't connect")
