@@ -7,6 +7,7 @@ import openpyxl
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.styles import Border, Side, Font, Alignment
 from openpyxl.styles import PatternFill
+from openpyxl.formatting.rule import ColorScaleRule, CellIsRule
 
 
 def request(url):
@@ -36,13 +37,12 @@ def get_data_frame(response):
 
     # print(df.head().columns)
     for i in range(so_hoc_vien):
-        start_lesson , total = 2 , 0
+        start_lesson = 2
         row = [i+1, df.iloc[i, 1].split()[0]]
-        
         if row[1] in source.LIST_ADMIN:
             continue
 
-        
+        total = 0
         for lesson in source.LESSON:
             accepted = (
                 df.iloc[i, start_lesson: start_lesson + lesson] == "10").sum()
@@ -58,6 +58,9 @@ def get_data_frame(response):
 
     new_df = new_df.rename(columns={0: "Rank", 1: "Name", 27: "Total"})
 
+    # for NAME in new_df["Name"]:
+    #     if NAME in source.LIST_ADMIN:
+    #         new_df = new_df.drop(new_df[new_df["Name"] == NAME].index)
     return new_df
 
 
@@ -68,8 +71,6 @@ def format_cell(df):
 
     for row in dataframe_to_rows(df, index=False, header=True):
         sheet.append(row)
-    
-    sheet.column_dimensions['B'].width = 25 
     # print(sheet)
 
     thin_border = Border(left=Side(style='thin'),
@@ -81,14 +82,20 @@ def format_cell(df):
     custom_alignment = Alignment(
         horizontal='center', vertical='center', wrap_text=False)
 
+    # rule = CellIsRule(
+    #     formula=[
+    #         'INT(LEFT(A1, FIND("/", A1) - 1)) >= INT(RIGHT(A1, LEN(A1) - FIND("/", A1))'],
+    #     stopIfTrue=False,
+    #     fill=PatternFill(start_color='00FF00',
+    #                      end_color='00FF00', fill_type='solid')
+    # )
     fill_green = PatternFill(start_color='00FF00',
-                             end_color='00FF00', fill_type='solid')
+                       end_color='00FF00', fill_type='solid')
     fill_yellow = PatternFill(start_color='FFFF00',
-                              end_color='FFFF00', fill_type='solid')
+                       end_color='FFFF00', fill_type='solid')
     fill_red = PatternFill(start_color='FF0000',
-                           end_color='FF0000', fill_type='solid')
-    
-    
+                       end_color='FF0000', fill_type='solid')
+
 
     for row in sheet.iter_rows():
         for cell in row:
@@ -106,7 +113,6 @@ def format_cell(df):
                         cell.fill = fill_red
 
     workbook.save("BXH.xlsx")
-
 
 if __name__ == "__main__":
     res = request(source.URL)

@@ -14,10 +14,10 @@ CLASS = {33: "https://laptrinh24h.vn/contest/cpp33/ranking/",
          34: "https://laptrinh24h.vn/contest/cpp34/ranking/"}
 # Class Fullhouse
 
-URL = CLASS[33]
+URL = CLASS[34]
 # Link to data table
 
 EXCEL = "BXH.xlsx"
 
-LIST_ADMIN = ["laihieu2714", "Tran_Nhi0306",
+LIST_ADMIN = ["laihieu2714", "Tran_Nhi0306","Hoang_Manh_Duy_FullHouse",
               "superadmin", "Ninhkfc72","Nguyen_Thi_Lua_FullHouse"]
