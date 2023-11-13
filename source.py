@@ -23,4 +23,4 @@ EXCEL = "BXH.xlsx"
 LIST_ADMIN = ["laihieu2714", "Tran_Nhi0306", "Huynh_Duc_Thinh_FullHouse",
               "Nguyen_Thu_Ha_FullHouse",
               "Bui_Hoai_Anh_FullHouse",
-              "superadmin", "Ninhkfc72", "Nguyen_Thi_Lua_FullHouse"]
+              "superadmin", "Ninhkfc72", "Nguyen_Thi_Lua_FullHouse","Vu_Trong_Dai_Fullhouse"]

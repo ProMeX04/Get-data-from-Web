@@ -39,16 +39,16 @@ def get_data_frame(response):
         if row[1] in source.LIST_ADMIN:
             continue
 
-        for index, lesson in enumerate(source.LESSON, start = 1):
+        for index, lesson in enumerate(source.LESSON, start=1):
             accepted = (
                 df.iloc[i, start_lesson: start_lesson + lesson] == "10").sum()
             total += accepted
             if accepted:
                 row.append(f"{accepted}/{lesson}")
             else:
-                if index < source.CURRENT_LESSON and lesson != 0: 
+                if index < source.CURRENT_LESSON and lesson != 0:
                     row.append(f"{accepted}/{lesson}")
-                else :
+                else:
                     row.append("")
 
             start_lesson += lesson
@@ -114,6 +114,7 @@ if __name__ == "__main__":
         dataframe = get_data_frame(res)
         format_cell(dataframe)
         subprocess.Popen(["start", source.EXCEL], shell=True)
-        
+
     else:
         print("Can't connect")
+print ("hello world")
