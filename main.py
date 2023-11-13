@@ -11,7 +11,7 @@ num_exercise = (29, 20, 27, 0, 7, 17, 0, 6, 26, 13, 5, 10,
                 19, 0, 20, 6, 6, 10, 0, 6, 0, 0, 11, 0, 5, 258)
 
 # Session ID của bạn (cần được cung cấp)
-session_id = 'emeb9z3vwqzqw3q1o61f6ob7jkr29eoe'
+session_id = 'fe8ijbpm7v0r6hookq4coniwnqmjksdg'
 
 # Đường dẫn lưu trữ dữ liệu dưới dạng CSV
 __path__ = "BXH.csv"
@@ -60,7 +60,7 @@ def request(session_id) -> None:
     """
     session = requests.Session()
     session.cookies.set('sessionid', session_id)
-    response = session.get("https://laptrinh24h.vn/contest/cpp34/ranking/")
+    response = session.get("https://laptrinh24h.vn/contest/cpp33/ranking/")
     return response
 
 

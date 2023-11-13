@@ -5,8 +5,7 @@ import pandas as pd
 import source
 import openpyxl
 from openpyxl.utils.dataframe import dataframe_to_rows
-from openpyxl.styles import Border, Side, Font, Alignment
-from openpyxl.styles import PatternFill
+from openpyxl.styles import Border, Side, Font, Alignment, PatternFill
 
 
 def request(url):
@@ -30,27 +29,28 @@ def get_data_frame(response):
         head = str(i) + "  10"
         df[head] = df[head].astype(str).str[0:2]
 
-    # print(df)
     new_df = pd.DataFrame()
     so_hoc_vien = df.shape[0]
 
-    # print(df.head().columns)
     for i in range(so_hoc_vien):
-        start_lesson , total = 2 , 0
+        start_lesson, total = 2, 0
         row = [i+1, df.iloc[i, 1].split()[0]]
-        
+
         if row[1] in source.LIST_ADMIN:
             continue
 
-        
-        for lesson in source.LESSON:
+        for index, lesson in enumerate(source.LESSON, start = 1):
             accepted = (
                 df.iloc[i, start_lesson: start_lesson + lesson] == "10").sum()
             total += accepted
             if accepted:
                 row.append(f"{accepted}/{lesson}")
             else:
-                row.append("")
+                if index < source.CURRENT_LESSON and lesson != 0: 
+                    row.append(f"{accepted}/{lesson}")
+                else :
+                    row.append("")
+
             start_lesson += lesson
         row.append(f"{total}/{source.TOTAL}")
         new_df = pd.concat(
@@ -68,9 +68,9 @@ def format_cell(df):
 
     for row in dataframe_to_rows(df, index=False, header=True):
         sheet.append(row)
-    
-    sheet.column_dimensions['B'].width = 25 
-    # print(sheet)
+
+    sheet.column_dimensions['B'].width = 25
+    sheet.column_dimensions['A'].width = 5
 
     thin_border = Border(left=Side(style='thin'),
                          right=Side(style='thin'),
@@ -87,8 +87,6 @@ def format_cell(df):
                               end_color='FFFF00', fill_type='solid')
     fill_red = PatternFill(start_color='FF0000',
                            end_color='FF0000', fill_type='solid')
-    
-    
 
     for row in sheet.iter_rows():
         for cell in row:
@@ -109,13 +107,13 @@ def format_cell(df):
 
 
 if __name__ == "__main__":
+    print("Connecting...")
     res = request(source.URL)
     if res.status_code == 200:
         print("Success")
         dataframe = get_data_frame(res)
         format_cell(dataframe)
         subprocess.Popen(["start", source.EXCEL], shell=True)
-
-        # dataframe_to_excel(dataframe)
+        
     else:
         print("Can't connect")
