@@ -17,10 +17,8 @@ CLASS = {33: "https://laptrinh24h.vn/contest/cpp33/ranking/",
 URL = CLASS[34]
 # Link to data table
 
-CURRENT_LESSON = 4
+CURRENT_LESSON = 26
 EXCEL = "BXH.xlsx"
 
-LIST_ADMIN = ["laihieu2714", "Tran_Nhi0306", "Huynh_Duc_Thinh_FullHouse",
-              "Nguyen_Thu_Ha_FullHouse",
-              "Bui_Hoai_Anh_FullHouse",
-              "superadmin", "Ninhkfc72", "Nguyen_Thi_Lua_FullHouse","Vu_Trong_Dai_Fullhouse"]
+LIST_ADMIN = ["laihieu2714", "Tran_Nhi0306",
+              "superadmin", "Ninhkfc72", "Nguyen_Thi_Lua_FullHouse"]

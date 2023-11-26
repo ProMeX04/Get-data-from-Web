@@ -2,6 +2,7 @@
 import subprocess
 import requests
 import pandas as pd
+from io import StringIO
 import source
 import openpyxl
 from openpyxl.utils.dataframe import dataframe_to_rows
@@ -19,11 +20,11 @@ def request(url):
 def get_data_frame(response):
     """_summary_
     """
-    df = pd.read_html(response.text)[0]
+    df = pd.read_html(StringIO(response.text))[0]
     # Read Table from web
     df = df.drop(columns=["Organization"])
     df = df.drop(columns=["Points"])
-
+    ần
     # Delete column Organization
     for i in range(1, 259):
         head = str(i) + "  10"
