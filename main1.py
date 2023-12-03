@@ -1,4 +1,3 @@
-""" main """
 import subprocess
 import requests
 import pandas as pd
@@ -28,7 +27,7 @@ EXCEL_PATH = "BXH.xlsx"
 LIST_ADMIN = ["laihieu2714", "Tran_Nhi0306","superadmin", "Ninhkfc72", "Nguyen_Thi_Lua_FullHouse"]
 
 
-def login(username, password):
+def login(username, password) -> str:
     """Login and retrieve session ID"""
     session = requests.Session()
     
@@ -47,7 +46,7 @@ def login(username, password):
     return session_id
 
 
-def request(url):
+def request(url) -> requests.Response:
     """Get response html web"""
     session = requests.Session()
     session.cookies['sessionid'] = login(USERNAME, PASSWORD)
@@ -55,7 +54,7 @@ def request(url):
     return response
 
 
-def get_data_frame(response):
+def get_data_frame(response) -> pd.DataFrame:
     """
     Parses the response text and returns a pandas DataFrame with the extracted data.
 
@@ -108,7 +107,7 @@ def get_data_frame(response):
     return new_df
 
 
-def format_cell(df):
+def format_cell(df) -> None:
     """
     Format cell in excel.
 
@@ -164,7 +163,8 @@ def format_cell(df):
     workbook.save(EXCEL_PATH)
 
 
-if __name__ == "__main__":
+def main():
+    """Main function"""
     res = request("https://laptrinh24h.vn/contest/cpp{}/ranking/".format(CLASS))
     if res.status_code == 200:
         print("Login success")
@@ -174,3 +174,7 @@ if __name__ == "__main__":
 
     else:
         print("Password or username is wrong")
+
+
+if __name__ == "__main__":
+    main()
