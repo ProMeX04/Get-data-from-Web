@@ -3,8 +3,6 @@ DATA = {
     "session_id": "emeb9z3vwqzqw3q1o61f6ob7jkr29eoe",
     "csrftoken": "emeb9z3vwqzqw3q1o61f6ob7jkr29eoe"
 }
-SESSION_ID = "fe8ijbpm7v0r6hookq4coniwnqmjksdg"
-# Session id when accessed
 
 LESSON = (29, 20, 27, 0, 7, 17, 0, 6, 26, 13, 5, 10,
           19, 0, 20, 6, 6, 10, 0, 6, 0, 0, 11, 0, 5)

@@ -9,22 +9,40 @@ from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.styles import Border, Side, Font, Alignment, PatternFill
 
 
+def login(username, password):
+    """Login and retrieve session ID"""
+    login_url = "https://laptrinh24h.vn/accounts/login/?next="  # Replace with your login URL
+    session = requests.Session()
+
+    # Get CSRF token
+    response = session.get(login_url)
+    csrf_token = response.cookies.get("csrftoken")
+
+    payload = {
+        "username": username,
+        "password": password,
+        "csrfmiddlewartoken": csrf_token
+    }
+    session.post(login_url, data=payload)
+    session_id = session.cookies.get("sessionid")
+    return session_id
+
+
 def request(url):
     """Get response html web"""
     session = requests.Session()
-    session.cookies['sessionid'] = source.SESSION_ID
+    session.cookies['sessionid'] = login("laihieu2714", "iiviizedz")
     response = session.get(url)
     return response
 
 
 def get_data_frame(response):
-    """_summary_
-    """
+    """_summary_"""
     df = pd.read_html(StringIO(response.text))[0]
     # Read Table from web
     df = df.drop(columns=["Organization"])
     df = df.drop(columns=["Points"])
-    ần
+
     # Delete column Organization
     for i in range(1, 259):
         head = str(i) + "  10"
@@ -63,7 +81,15 @@ def get_data_frame(response):
 
 
 def format_cell(df):
-    """format cell in excel"""
+    """
+    Format cell in excel.
+
+    Args:
+        df (pandas.DataFrame): The DataFrame containing the data to be formatted.
+
+    Returns:
+        None
+    """
     workbook = openpyxl.Workbook()
     sheet = workbook.active
 
@@ -91,11 +117,14 @@ def format_cell(df):
 
     for row in sheet.iter_rows():
         for cell in row:
+            # Rest of the code...
             cell.border = thin_border
             cell.font = custom_font
             cell.alignment = custom_alignment
             if cell.value:
                 if len(str(cell.value).split('/')) == 2:
+                    # Rest of the code...
+                    pass
                     left, right = cell.value.split('/')
                     if int(left) >= int(right):
                         cell.fill = fill_green
