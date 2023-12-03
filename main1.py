@@ -12,7 +12,7 @@ import subprocess
 USERNAME = "laihieu2714"
 PASSWORD = "iiviizedz"
 
-#create list lesson 
+# create list lesson 
 LESSON = (29, 20, 27, 0, 7, 17, 0, 6, 26, 13, 5, 10, 19, 0, 20, 6, 6, 10, 0, 6, 0, 0, 11, 0, 5)
 TOTAL = 258
 CURRENT_LESSON = 26
