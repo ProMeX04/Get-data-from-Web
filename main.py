@@ -186,11 +186,19 @@ def main():
      
 
     with open(os.path.join(file_path, 'user.txt'), "r") as file:
-        Username.set(file.readline().strip())
-        Password.set(file.readline().strip())
-        Class.set(file.readline().strip())
-        CurrentLesson.set(int(file.readline().strip()))
-        ExcelPath.set(file.readline().strip())
+        lines = file.readlines()
+        if len(lines) >= 5:
+            Username.set(lines[0].strip())
+            Password.set(lines[1].strip())
+            Class.set(lines[2].strip())
+            CurrentLesson.set(int(lines[3].strip()))
+            ExcelPath.set(lines[4].strip())
+        else:
+            Username.set("")
+            Password.set("")
+            Class.set("")
+            CurrentLesson.set(0)
+            ExcelPath.set("")
         
 
     ttk.Entry(window, textvariable=Username , font = "consolas").grid(row=0, column=1)
@@ -219,10 +227,24 @@ def main():
             format_cell(dataframe, ExcelPath.get())
             subprocess.Popen(["start", ExcelPath.get()], shell=True)
         else:
-            Color = "Red"
-            Status.set("Password or Username is wrong")
+            Status.set("Username or Password is wrong")
     
     
+    def focus_next_widget(event):
+        """Focus the next widget"""
+        event.widget.tk_focusNext().focus()
+        return("break")
+
+
+    def focus_previous_widget(event):
+        """Focus the previous widget"""
+        event.widget.tk_focusPrev().focus()
+        return("break")
+
+
+    # Bind the keys to the focus change functions
+    window.bind('<Down>', focus_next_widget)
+    window.bind('<Up>', focus_previous_widget)
     ttk.Button(window, text="Browse", command=browse_folder).grid(row=4, column=2)
     ttk.Button(window, text="GET",command = button ).grid(row=5, column=1)
 
