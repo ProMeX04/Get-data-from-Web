@@ -159,28 +159,35 @@ def format_cell(dataFrame, ExcelPath) -> None:
 def main():
     """main"""
     window = ThemedTk(theme = "material")
+    window.iconbitmap("ico.ico")
     window.title("GET DATA")
-    window.geometry("380x170")
+    window.geometry("380x180")
     window.resizable(True, True)
-    ttk.Label(window, text="Username ",font="calibri",foreground = "Green").grid(row=0, column=0)
-    ttk.Label(window, text="Password ",font="calibri",foreground = "Green").grid(row=1, column=0)
-    ttk.Label(window, text="Class ",font="calibri",foreground = "Green").grid(row=2, column=0)
-    ttk.Label(window, text="Current lesson ",font="calibri",foreground = "Green").grid(row=3, column=0)
-    ttk.Label(window, text="Path ",font="calibri",foreground = "Green").grid(row=4, column=0)
+    
     
     Username = tk.StringVar()
     Password = tk.StringVar()
     Class = tk.StringVar()
     ExcelPath = tk.StringVar()
-    CurrentLesson = tk.IntVar()    
+    CurrentLesson = tk.IntVar()   
+    Status = tk.StringVar()
+    
+    
+    ttk.Label(window, text="Username ",font="calibri",foreground = "Green").grid(row=0, column=0)
+    ttk.Label(window, text="Password ",font="calibri",foreground = "Green").grid(row=1, column=0)
+    ttk.Label(window, text="Class ",font="calibri",foreground = "Green").grid(row=2, column=0)
+    ttk.Label(window, text="Current lesson ",font="calibri",foreground = "Green").grid(row=3, column=0)
+    ttk.Label(window, text="Path ",font="calibri",foreground = "Green").grid(row=4, column=0)
+    ttk.Label(window, textvariable=Status, foreground="RED", font= "consolas").grid(row=6, columnspan=3)
+     
 
-    with open(r"D:\GitHub\Get-data-from-Web\Get-data-from-Web\user.txt", "r") as file:
+    with open("user.txt", "r") as file:
         Username.set(file.readline().strip())
         Password.set(file.readline().strip())
         Class.set(file.readline().strip())
         CurrentLesson.set(int(file.readline().strip()))
         ExcelPath.set(file.readline().strip())
-    
+        
 
     ttk.Entry(window, textvariable=Username , font = "consolas").grid(row=0, column=1)
     ttk.Entry(window, textvariable=Password, show="*" , font="consolas").grid(row=1, column=1)
@@ -188,26 +195,28 @@ def main():
     ttk.Entry(window, textvariable=CurrentLesson , font="consolas").grid(row=3, column=1)
     ttk.Entry(window, textvariable=ExcelPath, font="consolas").grid(row=4, column=1)
     
+    
     def browse_folder():
         """Browse for Excel path"""
         path = filedialog.askdirectory()
         ExcelPath.set(path+"/data.xlsx")
     
+    
     def button():
         """Button"""
         
-        with open(r"D:\GitHub\Get-data-from-Web\Get-data-from-Web\user.txt", "w") as file:
+        with open("user.txt", "w") as file:
             file.write(Username.get() + "\n" + Password.get() + "\n" + Class.get() + "\n" + str(CurrentLesson.get()) + "\n" + ExcelPath.get())
             
         response = request("https://laptrinh24h.vn/contest/cpp{}/ranking/".format(Class.get()), Username.get(), Password.get())
         if response.status_code == 200:
-            ttk.Label(window, text="Login success", foreground="green").grid(row=6, column=1)
+            Status.set("Login Success")
             dataframe = getDataFrame(response , CurrentLesson.get())
             format_cell(dataframe, ExcelPath.get())
             subprocess.Popen(["start", ExcelPath.get()], shell=True)
-            window.destroy()
         else:
-            ttk.Label(window, text="Password or username is wrong", foreground="red", font= "consolas").grid(row=5, columnspan=2)
+            Color = "Red"
+            Status.set("Password or Username is wrong")
     
     
     ttk.Button(window, text="Browse", command=browse_folder).grid(row=4, column=2)
