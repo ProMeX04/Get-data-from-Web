@@ -1,127 +1,224 @@
-"""Cài đặt python và Cài đặt các thư viện phía dưới mới có thể sử dụng được"""
 import subprocess
-from tkinter import *
 import requests
-from bs4 import BeautifulSoup
-# Danh sách các buổi
-list_lesson = (2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
-               15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26)
-# Số lượng bài tập
-num_exercise = (29, 20, 27, 0, 7, 17, 0, 6, 26, 13, 5, 10,
-                19, 0, 20, 6, 6, 10, 0, 6, 0, 0, 11, 0, 5, 258)
+import pandas as pd
+from io import StringIO
+import openpyxl
+from openpyxl.utils.dataframe import dataframe_to_rows
+from openpyxl.styles import Border, Side, Font, Alignment, PatternFill
+import subprocess
+import tkinter as tk
+from tkinter import filedialog
+from tkinter import ttk
+from ttkthemes import ThemedTk
 
-# Session ID của bạn (cần được cung cấp)
-session_id = 'fe8ijbpm7v0r6hookq4coniwnqmjksdg'
+# Constant Variable
+#create list lesson 
+LESSON = (29, 20, 27, 0, 7, 17, 0, 6, 26, 13, 5, 10, 19, 0, 20, 6, 6, 10, 0, 6, 0, 0, 11, 0, 5)
+TOTAL = 258
 
-# Đường dẫn lưu trữ dữ liệu dưới dạng CSV
-__path__ = "BXH.csv"
-
-# Danh sách các thành viên cần kiểm tra (có thể thay đổi mặc định theo nhóm)
-group = ["alisegaunt", "Hoanghieu2603", "", "", "kienbnvn2004", "", "", "",
-         "", "", "", "", "", "", "nguyenvanchinh28", "Nguyenduytan",
-         "phanhhoccode", "anhkhoi16", "",
-         "Tram_le2003", "huynhduong152", "", "QuocThang",
-         "nguyenduchuong300903fullhouse", "", "nhi9999", "",
-         "gia_huy922004", "daoduykhai77", "HoanganhIT2K4",
-         "anhquan", "", "",
-         "Phuong_10", "Huongphanminh", "giaudeptrai", "Ducthinh20",
-         "ninhlong21", "duongngan1810", "duongngan1810"]
+# list admin
+LIST_ADMIN = ["laihieu2714", "Tran_Nhi0306","superadmin", "Ninhkfc72", "Nguyen_Thi_Lua_FullHouse"]
 
 
-def user_interface():
-    """function show windows for user"""
-    window = Tk()
-    window.geometry("500x100")
-    window.title("Lấy dữ liệu bài tập")
-    label = Label(window, text="Nhập ID hoặc danh sách ID cần kiểm tra cách nhau bởi dấu cách", 
-                font="calibri")
-    label.pack(side='top')
-    entry = Entry(window, width=100, foreground="green")
-    entry.pack(side=TOP)
-
-    def get():
-        if (entry.get().split()):
-            global group
-            group = entry.get().split()
-        window.destroy()
-    button = Button(window, command=get, text="Collect", font="calibri")
-    button.pack(side=TOP)
-    window.mainloop()
-
-
-def request(session_id) -> None:
-    """_summary_
-
-    Args:
-        session_id (_string_): _session id from web_
-
-    Returns:
-        _type_: _string_
-    """
+def login(username, password) -> str:
+    """Login and retrieve session ID"""
     session = requests.Session()
-    session.cookies.set('sessionid', session_id)
-    response = session.get("https://laptrinh24h.vn/contest/cpp33/ranking/")
+    
+    # Get CSRF token
+    response = session.get("https://laptrinh24h.vn/accounts/login/?next=" )
+    csrf_token = response.cookies.get("csrftoken")
+
+    payload = {
+        "username": username,
+        "password": password,
+        "csrfmiddlewaretoken": csrf_token
+    }
+    session.post("https://laptrinh24h.vn/accounts/login/?next=" , data=payload)
+    
+    session_id = session.cookies.get("sessionid")
+    return session_id
+
+
+def request(url, username, password) -> requests.Response:
+    """Get response html web"""
+    session = requests.Session()
+    session.cookies['sessionid'] = login(username, password)
+    response = session.get(url)
     return response
 
 
-def get_data(response) -> list:
-    res = response.text
-    soup = BeautifulSoup(res, 'html.parser')
-    table = soup.find('table')
-    User = []
-    if table:
-        for index_row, row in enumerate(table.find_all("tr"), start=-1):
-            cnt = 0
-            for index_column, column in enumerate(row.find_all("td")):
-                if index_column == 0:
-                    User.append({"rank": column.text})
-                elif index_column == 2:
-                    User[index_row]["ID"] = column.find('a').text
-                    for i in list_lesson:
-                        User[index_row][str(i)] = 0
-                elif index_column > 2:
-                    anchor = column.find('a')
-                    if anchor:
-                        href = anchor.get('href')
-                        if href:
-                            bt = href.split(
-                                '/')[-2].rstrip("cpp").split('b')
-                            if len(bt) == 2:
-                                if anchor.text[:2] == '10':
-                                    User[index_row][bt[1]] += 1
-                                    cnt += 1
-            if index_row > -1:
-                User[index_row]["Total"] = cnt
-    return User
+def getDataFrame(response, CurrentLesson) -> pd.DataFrame:
+    """
+    Parses the response text and returns a pandas DataFrame with the extracted data.
+
+    Parameters:
+    response (requests.Response): The response object containing the HTML data.
+
+    Returns:
+    pandas.DataFrame: The DataFrame containing the parsed data.
+    """
+    df = pd.read_html(StringIO(response.text))[0]
+    # Rest of the code...
+    
+    df = df.drop(columns=["Organization"])
+    df = df.drop(columns=["Points"])
+
+    # Delete column Organization
+    for i in range(1, TOTAL-1):
+        head = str(i) + "  10"
+        df[head] = df[head].astype(str).str[0:2]
+
+    new_df = pd.DataFrame()
+    so_hoc_vien = df.shape[0]
+
+    for i in range(so_hoc_vien):
+        start_lesson, total = 2, 0
+        row = [i+1, df.iloc[i, 1].split()[0]]
+
+        if row[1] in LIST_ADMIN:
+            continue
+
+        for index, lesson in enumerate(LESSON, start=1):
+            accepted = (
+                df.iloc[i, start_lesson: start_lesson + lesson] == "10").sum()
+            total += accepted
+            if accepted:
+                row.append(f"{accepted}/{lesson}")
+            else:
+                if index < CurrentLesson and lesson != 0:
+                    row.append(f"{accepted}/{lesson}")
+                else:
+                    row.append("")
+
+            start_lesson += lesson
+        row.append(f"{total}/{TOTAL}")
+        new_df = pd.concat(
+            [new_df, pd.DataFrame([row])], ignore_index=True)
+
+    new_df = new_df.rename(columns={0: "Rank", 1: "Name", 27: "Total"})
+
+    return new_df
 
 
-def write_to_csv(__path__, group, User) -> None:
-    with open(__path__, "w", encoding="utf-8") as OutFile:
-        OutFile.write("Rank,ID,")
-        for i in list_lesson:
-            OutFile.write("Lesson "+str(i)+",")
-        OutFile.write("Total,")
-        OutFile.write("\n")
-        for ID in group:
-            for x in User:
-                if x["ID"] == ID:
-                    for index, j in enumerate(x):
-                        if (x[j] != 0):
-                            OutFile.write(" "+str(x[j]))
-                            if index > 1:
-                                OutFile.write('/'+str(num_exercise[index-2]))
-                        OutFile.write(',')
-            OutFile.write("\n")
+def format_cell(dataFrame, ExcelPath) -> None:
+    """
+    Format cell in excel.
+
+    Args:
+        dataFrame (pandas.DataFrame): The DataFrame containing the data to be formatted.
+
+    Returns:
+        None
+    """
+    workbook = openpyxl.Workbook()
+    sheet = workbook.active
+
+    for row in dataframe_to_rows(dataFrame, index=False, header=True):
+        sheet.append(row)
+
+    sheet.column_dimensions['B'].width = 25
+    sheet.column_dimensions['A'].width = 5
+
+    thin_border = Border(left=Side(style='thin'),
+                         right=Side(style='thin'),
+                         top=Side(style='thin'),
+                         bottom=Side(style='thin'))
+    custom_font = Font(name='Calibri', size=10, bold=True,
+                       italic=True, color='000000')
+    custom_alignment = Alignment(
+        horizontal='center', vertical='center', wrap_text=False)
+
+    fill_green = PatternFill(start_color='00FF00',
+                             end_color='00FF00', fill_type='solid')
+    fill_yellow = PatternFill(start_color='FFFF00',
+                              end_color='FFFF00', fill_type='solid')
+    fill_red = PatternFill(start_color='FF0000',
+                           end_color='FF0000', fill_type='solid')
+
+    for row in sheet.iter_rows():
+        for cell in row:
+            # Rest of the code...
+            cell.border = thin_border
+            cell.font = custom_font
+            cell.alignment = custom_alignment
+            if cell.value:
+                if len(str(cell.value).split('/')) == 2:
+                    # Rest of the code...
+                    pass
+                    left, right = cell.value.split('/')
+                    if int(left) >= int(right):
+                        cell.fill = fill_green
+                    elif int(left) >= int(right)//2:
+                        cell.fill = fill_yellow
+                    else:
+                        cell.fill = fill_red
+
+    workbook.save(ExcelPath)
 
 
-if __name__ == "__main__":
-    # bật / tắt giao diện nhập
-    user_interface()
-    res = request(session_id)
-    if res.status_code == 200:
-        print("Success")
-        data = get_data(res)
-        write_to_csv(__path__, group, data)
-        subprocess.Popen(['start', __path__], shell=True)
-    else:
-        print("Can't connect")
+def main():
+    """main"""
+    window = ThemedTk(theme = "material")
+    window.title("GET DATA")
+    window.geometry("380x170")
+    window.resizable(True, True)
+    ttk.Label(window, text="Username ",font="calibri",foreground = "Green").grid(row=0, column=0)
+    ttk.Label(window, text="Password ",font="calibri",foreground = "Green").grid(row=1, column=0)
+    ttk.Label(window, text="Class ",font="calibri",foreground = "Green").grid(row=2, column=0)
+    ttk.Label(window, text="Current lesson ",font="calibri",foreground = "Green").grid(row=3, column=0)
+    ttk.Label(window, text="Path ",font="calibri",foreground = "Green").grid(row=4, column=0)
+    
+    Username = tk.StringVar()
+    Password = tk.StringVar()
+    Class = tk.StringVar()
+    ExcelPath = tk.StringVar()
+    CurrentLesson = tk.IntVar()    
+
+    with open(r"D:\GitHub\Get-data-from-Web\Get-data-from-Web\user.txt", "r") as file:
+        Username.set(file.readline().strip())
+        Password.set(file.readline().strip())
+        Class.set(file.readline().strip())
+        CurrentLesson.set(int(file.readline().strip()))
+        ExcelPath.set(file.readline().strip())
+    
+
+    ttk.Entry(window, textvariable=Username , font = "consolas").grid(row=0, column=1)
+    ttk.Entry(window, textvariable=Password, show="*" , font="consolas").grid(row=1, column=1)
+    ttk.Entry(window, textvariable=Class , font="consolas").grid(row=2, column=1)
+    ttk.Entry(window, textvariable=CurrentLesson , font="consolas").grid(row=3, column=1)
+    ttk.Entry(window, textvariable=ExcelPath, font="consolas").grid(row=4, column=1)
+    
+    def browse_folder():
+        """Browse for Excel path"""
+        path = filedialog.askdirectory()
+        ExcelPath.set(path+"/data.xlsx")
+    
+    def button():
+        """Button"""
+        
+        with open(r"D:\GitHub\Get-data-from-Web\Get-data-from-Web\user.txt", "w") as file:
+            file.write(Username.get() + "\n" + Password.get() + "\n" + Class.get() + "\n" + str(CurrentLesson.get()) + "\n" + ExcelPath.get())
+            
+        response = request("https://laptrinh24h.vn/contest/cpp{}/ranking/".format(Class.get()), Username.get(), Password.get())
+        if response.status_code == 200:
+            ttk.Label(window, text="Login success", foreground="green").grid(row=6, column=1)
+            dataframe = getDataFrame(response , CurrentLesson.get())
+            format_cell(dataframe, ExcelPath.get())
+            subprocess.Popen(["start", ExcelPath.get()], shell=True)
+            window.destroy()
+        else:
+            ttk.Label(window, text="Password or username is wrong", foreground="red", font= "consolas").grid(row=5, columnspan=2)
+    
+    
+    ttk.Button(window, text="Browse", command=browse_folder).grid(row=4, column=2)
+    ttk.Button(window, text="GET",command = button ).grid(row=5, column=1)
+
+    # Create a button with the new style
+    button = ttk.Button(window, text="GET", command=button, style='TButton')
+    button.grid(row=5, column=1)
+
+
+    window.mainloop()
+
+main()
+
