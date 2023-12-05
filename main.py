@@ -161,13 +161,11 @@ def main():
     """main"""
     file_path = os.path.dirname(os.path.abspath(__file__))
     
-    window = ThemedTk(theme = "material")
+    window = ThemedTk(theme="material")
     window.iconbitmap(os.path.join(file_path, 'ico.ico'))
     window.title("GET DATA")
     window.geometry("380x180")
     window.resizable(False, False)
-    
-    
     
     Username = tk.StringVar()
     Password = tk.StringVar()
@@ -176,23 +174,21 @@ def main():
     CurrentLesson = tk.IntVar()   
     Status = tk.StringVar()
     
+    ttk.Label(window, text="Username ", font="calibri", foreground="Green").grid(row=0, column=0)
+    ttk.Label(window, text="Password ", font="calibri", foreground="Green").grid(row=1, column=0)
+    ttk.Label(window, text="Class ", font="calibri", foreground="Green").grid(row=2, column=0)
+    ttk.Label(window, text="Current lesson ", font="calibri", foreground="Green").grid(row=3, column=0)
+    ttk.Label(window, text="Path ", font="calibri", foreground="Green").grid(row=4, column=0)
+    ttk.Label(window, textvariable=Status, foreground="RED", font="consolas").grid(row=6, columnspan=3)
     
-    ttk.Label(window, text="Username ",font="calibri",foreground = "Green").grid(row=0, column=0)
-    ttk.Label(window, text="Password ",font="calibri",foreground = "Green").grid(row=1, column=0)
-    ttk.Label(window, text="Class ",font="calibri",foreground = "Green").grid(row=2, column=0)
-    ttk.Label(window, text="Current lesson ",font="calibri",foreground = "Green").grid(row=3, column=0)
-    ttk.Label(window, text="Path ",font="calibri",foreground = "Green").grid(row=4, column=0)
-    ttk.Label(window, textvariable=Status, foreground="RED", font= "consolas").grid(row=6, columnspan=3)
-     
-
-    with open(os.path.join(file_path, 'user.txt'), "r") as file:
+    with open(os.path.join(file_path, 'user.bin'), "rb") as file:
         lines = file.readlines()
         if len(lines) >= 5:
-            Username.set(lines[0].strip())
-            Password.set(lines[1].strip())
-            Class.set(lines[2].strip())
-            CurrentLesson.set(int(lines[3].strip()))
-            ExcelPath.set(lines[4].strip())
+            Username.set(lines[0].strip().decode())
+            Password.set(lines[1].strip().decode())
+            Class.set(lines[2].strip().decode())
+            CurrentLesson.set(int(lines[3].strip().decode()))
+            ExcelPath.set(lines[4].strip().decode())
         else:
             Username.set("")
             Password.set("")
@@ -200,25 +196,58 @@ def main():
             CurrentLesson.set(0)
             ExcelPath.set("")
         
-
-    ttk.Entry(window, textvariable=Username , font = "consolas").grid(row=0, column=1)
-    ttk.Entry(window, textvariable=Password, show="*" , font="consolas").grid(row=1, column=1)
-    ttk.Entry(window, textvariable=Class , font="consolas").grid(row=2, column=1)
-    ttk.Entry(window, textvariable=CurrentLesson , font="consolas").grid(row=3, column=1)
+    ttk.Entry(window, textvariable=Username, font="consolas").grid(row=0, column=1)
+    ttk.Entry(window, textvariable=Password, show="*", font="consolas").grid(row=1, column=1)
+    ttk.Entry(window, textvariable=Class, font="consolas").grid(row=2, column=1)
+    ttk.Entry(window, textvariable=CurrentLesson, font="consolas").grid(row=3, column=1)
     ttk.Entry(window, textvariable=ExcelPath, font="consolas").grid(row=4, column=1)
-    
     
     def browse_folder():
         """Browse for Excel path"""
         path = filedialog.askdirectory()
-        ExcelPath.set(path+"/data.xlsx")
+        ExcelPath.set(path + "/data.xlsx")
+    
+    def button():
+        """Button"""
+        with open(os.path.join(file_path, 'user.bin'), "wb") as file:
+            file.write(Username.get().encode() + b"\n" + Password.get().encode() + b"\n" + Class.get().encode() + b"\n" + str(CurrentLesson.get()).encode() + b"\n" + ExcelPath.get().encode())
+        response = request("https://laptrinh24h.vn/contest/cpp{}/ranking/".format(Class.get()), Username.get(), Password.get())
+        if response.status_code == 200:
+            Status.set("Login Success")
+            dataframe = getDataFrame(response, CurrentLesson.get())
+            format_cell(dataframe, ExcelPath.get())
+            subprocess.Popen(["start", ExcelPath.get()], shell=True)
+        else:
+            Status.set("Username or Password is wrong")
+    
+    def focus_next_widget(event):
+        """Focus the next widget"""
+        event.widget.tk_focusNext().focus()
+        return("break")
+    
+    def focus_previous_widget(event):
+        """Focus the previous widget"""
+        event.widget.tk_focusPrev().focus()
+        return("break")
+    
+    # Bind the keys to the focus change functions
+    window.bind('<Down>', focus_next_widget)
+    window.bind('<Up>', focus_previous_widget)
+    ttk.Button(window, text="Browse", command=browse_folder).grid(row=4, column=2)
+    ttk.Button(window, text="GET", command=button).grid(row=5, column=1)
+    
+    # Create a button with the new style
+    button = ttk.Button(window, text="GET", command=button, style='TButton')
+    button.grid(row=5, column=1)
+    
+    window.mainloop()
     
     
     def button():
         """Button"""
         
-        with open(os.path.join(file_path, 'user.txt'), "w") as file:
-            file.write(Username.get() + "\n" + Password.get() + "\n" + Class.get() + "\n" + str(CurrentLesson.get()) + "\n" + ExcelPath.get())
+        with open(os.path.join(file_path, 'user.bin'), "wb") as file:
+            file.write(Username.get().encode() + b"\n" + Password.get().encode() + b"\n" + Class.get().encode() + b"\n" + str(CurrentLesson.get()).encode() + b"\n" + ExcelPath.get().encode())
             
         response = request("https://laptrinh24h.vn/contest/cpp{}/ranking/".format(Class.get()), Username.get(), Password.get())
         if response.status_code == 200:
