@@ -164,7 +164,7 @@ def main():
     window = ThemedTk(theme="material")
     window.iconbitmap(os.path.join(file_path, 'ico.ico'))
     window.title("GET DATA")
-    window.geometry("380x180")
+    window.geometry("370x200")
     window.resizable(False, False)
     
     Username = tk.StringVar()
@@ -174,11 +174,11 @@ def main():
     CurrentLesson = tk.IntVar()   
     Status = tk.StringVar()
     
-    ttk.Label(window, text="Username ", font="calibri", foreground="Green").grid(row=0, column=0)
-    ttk.Label(window, text="Password ", font="calibri", foreground="Green").grid(row=1, column=0)
-    ttk.Label(window, text="Class ", font="calibri", foreground="Green").grid(row=2, column=0)
-    ttk.Label(window, text="Current lesson ", font="calibri", foreground="Green").grid(row=3, column=0)
-    ttk.Label(window, text="Path ", font="calibri", foreground="Green").grid(row=4, column=0)
+    ttk.Label(window, text="Username ", font="calibri", foreground="Green", anchor="w").grid(row=0, column=0, sticky="w")
+    ttk.Label(window, text="Password ", font="calibri", foreground="Green", anchor="w").grid(row=1, column=0, sticky="w")
+    ttk.Label(window, text="Class ", font="calibri", foreground="Green", anchor="w").grid(row=2, column=0, sticky="w")
+    ttk.Label(window, text="Current lesson ", font="calibri", foreground="Green", anchor="w").grid(row=3, column=0, sticky="w")
+    ttk.Label(window, text="Path ", font="calibri", foreground="Green", anchor="w").grid(row=4, column=0, sticky="w")
     ttk.Label(window, textvariable=Status, foreground="RED", font="consolas").grid(row=6, columnspan=3)
     
     with open(os.path.join(file_path, 'user.bin'), "rb") as file:
@@ -233,7 +233,7 @@ def main():
     # Bind the keys to the focus change functions
     window.bind('<Down>', focus_next_widget)
     window.bind('<Up>', focus_previous_widget)
-    ttk.Button(window, text="Browse", command=browse_folder).grid(row=4, column=2)
+    ttk.Button(window, text="...", command=browse_folder).grid(row=4, column=2)
     ttk.Button(window, text="GET", command=button).grid(row=5, column=1)
     
     # Create a button with the new style
