@@ -10,6 +10,7 @@ import tkinter as tk
 from tkinter import filedialog
 from tkinter import ttk
 from ttkthemes import ThemedTk
+import os
 
 # Constant Variable
 #create list lesson 
@@ -158,11 +159,14 @@ def format_cell(dataFrame, ExcelPath) -> None:
 
 def main():
     """main"""
+    file_path = os.path.dirname(os.path.abspath(__file__))
+    
     window = ThemedTk(theme = "material")
-    window.iconbitmap("ico.ico")
+    window.iconbitmap(os.path.join(file_path, 'ico.ico'))
     window.title("GET DATA")
     window.geometry("380x180")
-    window.resizable(True, True)
+    window.resizable(False, False)
+    
     
     
     Username = tk.StringVar()
@@ -181,7 +185,7 @@ def main():
     ttk.Label(window, textvariable=Status, foreground="RED", font= "consolas").grid(row=6, columnspan=3)
      
 
-    with open("user.txt", "r") as file:
+    with open(os.path.join(file_path, 'user.txt'), "r") as file:
         Username.set(file.readline().strip())
         Password.set(file.readline().strip())
         Class.set(file.readline().strip())
@@ -205,7 +209,7 @@ def main():
     def button():
         """Button"""
         
-        with open("user.txt", "w") as file:
+        with open(os.path.join(file_path, 'user.txt'), "w") as file:
             file.write(Username.get() + "\n" + Password.get() + "\n" + Class.get() + "\n" + str(CurrentLesson.get()) + "\n" + ExcelPath.get())
             
         response = request("https://laptrinh24h.vn/contest/cpp{}/ranking/".format(Class.get()), Username.get(), Password.get())
