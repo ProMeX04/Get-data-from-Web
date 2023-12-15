@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GET DATA</title>
+    <style>
+        /* Thêm CSS tại đây */
+        body {
+            font-family: Arial, sans-serif;
+        }
+        label {
+            display: block;
+            margin-top: 20px;
+        }
+        input[type="text"], input[type="password"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+        }
+        #status {
+            margin-top: 20px;
+            color: red;
+        }
+        #progressBar {
+            width: 100%;
+            background-color: #f3f3f3;
+            margin-top: 20px;
+        }
+        #progressBar div {
+            height: 20px;
+            background-color: #4CAF50;
+            width: 0;
+        }
+    </style>
+</head>
+<body>
+    <form id="dataForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password">
+        <label for="class_name">Class:</label>
+        <input type="text" id="class_name" name="class_name">
+        <label for="current_lesson">Current Lesson:</label>
+        <input type="number" id="current_lesson" name="current_lesson">
+        <label for="excel_path">Path:</label>
+        <input type="text" id="excel_path" name="excel_path">
+        <button type="button" onclick="getData()">GET</button>
+    </form>
+    <div id="status"></div>
+    <div id="progressBar"><div></div></div>
+    <script>
+        // Thêm JavaScript tại đây
+        function getData() {
+            // Logic để xử lý việc nhấn nút "GET" và cập nhật thanh tiến trình.
+            // Bạn sẽ cần thêm mã để giao tiếp với máy chủ tại đây.
+            var progressBar = document.querySelector('#progressBar div');
+            progressBar.style.width = '100%';
+        }
+    </script>
+</body>
+</html>
